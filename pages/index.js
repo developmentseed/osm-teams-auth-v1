@@ -32,31 +32,49 @@ class Home extends Component {
       <main>
         <section className='inner page welcome'>
           <div className='card'>
-            <h1 className='welcome__intro'><pre>{title}</pre></h1>
+            <h1 className='welcome__intro'>
+              <pre>{title}</pre>
+            </h1>
             <p>
-              Create teams of {publicRuntimeConfig.OSM_NAME} users and import them into your apps.
-              Making maps better, together. Enable teams in OpenStreetMap applications, or build your team here. It’s not safe to map alone.
+              Create teams of {publicRuntimeConfig.OSM_NAME} users and import
+              them into your apps. Making maps better, together. Enable teams in
+              OpenStreetMap applications, or build your team here. It’s not safe
+              to map alone.
             </p>
-            {
-              this.props.user.username
-                ? (
-                  <div className='welcome__user'>
-                    <h2>Welcome, {this.props.user.username}!</h2>
-                    <ul className='welcome__user--actions'>
-                      <li><a href={join(publicRuntimeConfig.APP_URL, '/teams/create')}>Create New Team</a></li>
-                      <li><a href={join(publicRuntimeConfig.APP_URL, '/teams')} className=''>All Teams</a></li>
-                      <li><a href={join(publicRuntimeConfig.APP_URL, '/profile')} className=''>Profile</a></li>
-                      <li><a href={join(publicRuntimeConfig.APP_URL, '/clients')} className=''>Connected Apps</a></li>
-                    </ul>
-                    <Button variant='danger' onClick={() => {
-                      window.sessionStorage.clear()
-                      Router.push('/logout')
-                    }
-                    }>Logout</Button>
-                  </div>
-                )
-                : <Button href='/login'>Sign in →</Button>
-            }
+            {this.props.user.username ? (
+              <div className='welcome__user'>
+                <h2>Welcome, {this.props.user.username}!</h2>
+                <ul className='welcome__user--actions'>
+                  <li>
+                    <a href='https://mapping.team/'>Manage Your Teams</a>
+                  </li>
+                  <li>
+                    <a href='https://mapping.team/developers'>
+                      Teams Developer Docs
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href={join(publicRuntimeConfig.APP_URL, '/clients')}
+                      className=''
+                    >
+                      Connected Apps
+                    </a>
+                  </li>
+                </ul>
+                <Button
+                  variant='danger'
+                  onClick={() => {
+                    window.sessionStorage.clear()
+                    Router.push('/logout')
+                  }}
+                >
+                  Logout
+                </Button>
+              </div>
+            ) : (
+              <Button href='/login'>Sign in →</Button>
+            )}
           </div>
           <div className='map-bg' />
         </section>
@@ -109,7 +127,9 @@ class Home extends Component {
               background: rgba(25,51,130, 0.9);
               border: 4px solid white;
               position: relative;
-              box-shadow: 12px 12px 0 ${theme.colors.primaryDark}, 12px 12px 0 3px white;
+              box-shadow: 12px 12px 0 ${
+      theme.colors.primaryDark
+      }, 12px 12px 0 3px white;
             }
 
             .welcome__intro {
