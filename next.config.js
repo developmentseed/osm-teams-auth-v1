@@ -8,7 +8,7 @@ module.exports = {
   serverRuntimeConfig: {
     NODE_ENV: process.env.NODE_ENV || 'development',
     OSM_DOMAIN: process.env.OSM_DOMAIN || 'https://www.openstreetmap.org',
-    OSM_API: process.env.OSM_API || process.env.OSM_DOMAIN || 'https://www.openstreetmap.org',
+    OSM_API: process.env.OSM_API || process.env.OSM_DOMAIN || 'https://api.openstreetmap.org',
     OSM_HYDRA_ID: process.env.OSM_HYDRA_ID || 'manage',
     OSM_HYDRA_SECRET: process.env.OSM_HYDRA_SECRET || 'manage-secret',
     OSM_CONSUMER_KEY: process.env.OSM_CONSUMER_KEY,
@@ -20,7 +20,7 @@ module.exports = {
     HYDRA_ADMIN_HOST: process.env.HYDRA_ADMIN_HOST || 'http://localhost:4445'
   },
   publicRuntimeConfig: {
-    APP_URL: process.env.APP_URL || 'http://localhost:8989',
+    APP_URL: process.env.APP_URL || 'http://127.0.0.1:8989',
     OSM_NAME: process.env.OSM_NAME || 'OSM'
   },
   onDemandEntries: {

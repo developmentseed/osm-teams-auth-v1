@@ -10,7 +10,7 @@ const url = require('url')
 const db = require('../db')
 const xml2js = require('xml2js')
 const InternalOAuthError = require('passport-oauth').InternalOAuthError
-const OSMStrategy = require('passport-openstreetmap').Strategy
+const OAuth2Strategy = require('passport-oauth2').Strategy
 
 const { serverRuntimeConfig, publicRuntimeConfig } = require('../../next.config')
 
@@ -23,8 +23,9 @@ function openstreetmap (req, res) {
   /**
    * override the userProfile method of OSMStrategy to allow for custom osm endpoints
    */
-  OSMStrategy.prototype.userProfile = function (token, tokenSecret, params, done) {
-    this._oauth.get(`${OSM_API}/api/0.6/user/details`, token, tokenSecret, function (err, body, res) {
+  OAuth2Strategy.prototype.userProfile = function (accessToken, done) {
+    this._oauth2.useAuthorizationHeaderforGET(true)
+    this._oauth2.get(`${OSM_API}/api/0.6/user/details`, accessToken, function (err, body, res) {
       if (err) { return done(new InternalOAuthError('failed to fetch user profile', err)) }
 
       var parser = new xml2js.Parser()
@@ -45,22 +46,22 @@ function openstreetmap (req, res) {
     })
   }
 
-  const strategy = new OSMStrategy({
-    requestTokenURL: `${OSM_API}/oauth/request_token`,
-    accessTokenURL: `${OSM_API}/oauth/access_token`,
-    userAuthorizationURL: `${OSM_DOMAIN}/oauth/authorize`,
-    consumerKey: OSM_CONSUMER_KEY,
-    consumerSecret: OSM_CONSUMER_SECRET,
+  const strategy = new OAuth2Strategy({
+    authorizationURL: `${OSM_DOMAIN}/oauth2/authorize`,
+    tokenURL: `${OSM_DOMAIN}/oauth2/token`,
+    clientID: OSM_CONSUMER_KEY,
+    scope: ['openid', 'read_prefs'],
+    clientSecret: OSM_CONSUMER_SECRET,
     callbackURL: `${publicRuntimeConfig.APP_URL}/oauth/openstreetmap/callback?login_challenge=${encodeURIComponent(challenge)}`
-  }, async (token, tokenSecret, profile, done) => {
+  }, async (accessToken, refreshToken, profile, done) => {
     let conn = await db()
     let [user] = await conn('users').where('id', profile.id)
     if (user) {
       const newProfile = R.mergeDeepRight(user.profile, profile)
       await conn('users').where('id', profile.id).update(
         {
-          'osmToken': token,
-          'osmTokenSecret': tokenSecret,
+          'osmToken': accessToken,
+          'osmTokenSecret': refreshToken,
           'profile': JSON.stringify(newProfile)
         }
       )
@@ -68,8 +69,8 @@ function openstreetmap (req, res) {
       await conn('users').insert(
         {
           'id': profile.id,
-          'osmToken': token,
-          'osmTokenSecret': tokenSecret,
+          'osmToken': accessToken,
+          'osmTokenSecret': refreshToken,
           profile: JSON.stringify(profile)
         }
       )
